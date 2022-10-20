@@ -139,6 +139,9 @@ int main(void)
 	/* USER CODE BEGIN WHILE */
 	while (1)
 	{
+		// Wait the ADXL345 to finish its measure
+		while(HAL_GPIO_ReadPin(INT_GPIO_Port, INT_Pin) == GPIO_PIN_RESET);
+
 		// Reads registers DATAX0 to DATAZ1
 		HAL_GPIO_WritePin(NSS_GPIO_Port, NSS_Pin, GPIO_PIN_RESET);
 		transmit_buffer = 0x80 + 0x40 + 0x32;
@@ -152,8 +155,6 @@ int main(void)
 
 		printf("x = %4d, y = %4d, z = %4d\r", x, y, z);
 		fflush(stdout);
-
-		HAL_Delay(100);
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
