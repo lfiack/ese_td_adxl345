@@ -50,7 +50,7 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
+void process_acceleration(uint32_t period, float acc_x, float acc_y, float acc_z);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -130,9 +130,11 @@ int main(void)
 	HAL_GPIO_WritePin(NSS_GPIO_Port, NSS_Pin, GPIO_PIN_SET);
 
 	uint8_t buffer[6];
-	int16_t x;
-	int16_t y;
-	int16_t z;
+	int16_t x_int;
+	int16_t y_int;
+	int16_t z_int;
+
+	float x, y, z;
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -149,12 +151,15 @@ int main(void)
 		HAL_SPI_Receive(&hspi2, buffer, 6, HAL_MAX_DELAY);
 		HAL_GPIO_WritePin(NSS_GPIO_Port, NSS_Pin, GPIO_PIN_SET);
 
-		x = buffer[0] + (buffer[1] << 8);
-		y = buffer[2] + (buffer[3] << 8);
-		z = buffer[4] + (buffer[5] << 8);
+		x_int = buffer[0] + (buffer[1] << 8);
+		y_int = buffer[2] + (buffer[3] << 8);
+		z_int = buffer[4] + (buffer[5] << 8);
 
-		printf("x = %4d, y = %4d, z = %4d\r", x, y, z);
-		fflush(stdout);
+		x = (float) x_int / 256.0;
+		y = (float) y_int / 256.0;
+		z = (float) z_int / 256.0;
+
+		process_acceleration(100, (float)x, (float)y, (float)z);
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
@@ -215,7 +220,38 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void process_acceleration(uint32_t period, float acc_x, float acc_y, float acc_z)
+{
+	static uint32_t tick_last = 0;
+	static uint32_t counter = 0;
+	static float acc_x_average = 0.0f;
+	static float acc_y_average = 0.0f;
+	static float acc_z_average = 0.0f;
+	uint32_t tick = HAL_GetTick();
 
+	acc_x_average += acc_x;
+	acc_y_average += acc_y;
+	acc_z_average += acc_z;
+	counter++;
+
+	if ((tick - tick_last) >= period)
+	{
+		acc_x_average /= counter;
+		acc_y_average /= counter;
+		acc_z_average /= counter;
+
+		printf("x=%1.2f, y=%1.2f, z=%1.2f\r", acc_x_average, acc_y_average, acc_z_average);
+		fflush(stdout);
+
+		acc_x_average = 0.0f;
+		acc_y_average = 0.0f;
+		acc_z_average = 0.0f;
+		counter = 0;
+
+		tick_last = tick;
+	}
+
+}
 /* USER CODE END 4 */
 
 /**
