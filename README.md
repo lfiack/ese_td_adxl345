@@ -33,8 +33,8 @@ void process_acceleration(float acc_x, float acc_y, float acc_z);
 ## Utilisation du driver
 1. Dans \texttt{main.c}, ajoutez et écrivez le code des fonctions suivantes:
 ```c
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-int spi_transmit(uint8_t address, uint8_t *p_data, uint16_t size)
-int spi_receive(uint8_t address, uint8_t *p_data, uint16_t size)
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
+int spi_transmit(uint8_t address, uint8_t *p_data, uint16_t size);
+int spi_receive(uint8_t address, uint8_t *p_data, uint16_t size);
 ```
 2. Réécrivez le \mintinline{C}{main()} en vous inspirant du squelette écrit précédemment.
