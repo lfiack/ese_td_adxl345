@@ -51,7 +51,7 @@ h_adxl345_t h_adxl345;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-void process_acceleration(uint32_t period, float acc_x, float acc_y, float acc_z);
+void process_acceleration(uint32_t period_ms, float acc_x, float acc_y, float acc_z);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -277,7 +277,7 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void process_acceleration(uint32_t period, float acc_x, float acc_y, float acc_z)
+void process_acceleration(uint32_t period_ms, float acc_x, float acc_y, float acc_z)
 {
 	static uint32_t tick_last = 0;
 	static uint32_t counter = 0;
@@ -291,7 +291,7 @@ void process_acceleration(uint32_t period, float acc_x, float acc_y, float acc_z
 	acc_z_average += acc_z;
 	counter++;
 
-	if ((tick - tick_last) >= period)
+	if ((tick - tick_last) >= period_ms)
 	{
 		acc_x_average /= counter;
 		acc_y_average /= counter;
